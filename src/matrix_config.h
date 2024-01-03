@@ -20,13 +20,12 @@
 #define PANEL_HEIGHT 64 // Panel height of 64 will required CH_E to be defined.
 #define PANELS_NUMBER 1 // Number of chained panels, if just a single panel, obviously set to 1
 
-#define PANE_WIDTH PANEL_WIDTH *PANELS_NUMBER
+#define PANE_WIDTH PANEL_WIDTH * PANELS_NUMBER
 #define PANE_HEIGHT PANEL_HEIGHT
-#define NUM_LEDS PANE_WIDTH *PANE_HEIGHT
+#define NUM_LEDS PANE_WIDTH * PANE_HEIGHT
 
 // Construct the MatrixPanel Object
-MatrixPanel_I2S_DMA *makePanel(bool double_buffer)
-{
+MatrixPanel_I2S_DMA* makePanel(bool double_buffer) {
     HUB75_I2S_CFG::i2s_pins _pins = {
         R1, G1, BL1,
         R2, G2, BL2,
