@@ -1,5 +1,6 @@
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 
+// GPIO ports on ESP32-S2
 #define R1 6
 #define G1 5
 #define BL1 9
@@ -38,6 +39,7 @@ MatrixPanel_I2S_DMA* makePanel(bool double_buffer) {
     mxconfig.driver = HUB75_I2S_CFG::FM6126A; // for panels using FM6126A chips
     mxconfig.double_buff = double_buffer; // <------------- Turn on double buffer
     mxconfig.i2sspeed = HUB75_I2S_CFG::HZ_20M;
+    mxconfig.min_refresh_rate = 255;
     // mxconfig.clkphase = false;
     return new MatrixPanel_I2S_DMA(mxconfig);
 }
