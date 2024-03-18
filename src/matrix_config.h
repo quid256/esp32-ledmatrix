@@ -1,6 +1,6 @@
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 
-// GPIO ports on ESP32-S2
+// GPIO ports on ESP32-S3
 #define R1 6
 #define G1 5
 #define BL1 9
@@ -13,8 +13,8 @@
 #define CH_D 16
 #define CH_E 17
 #define CLK 13
-#define LAT 38
-#define OE 39
+#define LAT 18
+#define OE 4
 
 // Configure for your panel(s) as appropriate!
 #define PANEL_WIDTH 64

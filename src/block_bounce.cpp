@@ -26,7 +26,8 @@ void loop() {
 
     // x += dx;
     // y += dy;
-    if (x == 0) {
+    if (x == 0)
+    {
         dx = +1;
     }
     // if (y == 0) { dy = +1; }
