@@ -8,7 +8,7 @@
 #include <Fonts/FreeSans9pt7b.h>
 #include "matrix_config.h"
 
-//MatrixPanel_I2S_DMA dma_display;
+// MatrixPanel_I2S_DMA dma_display;
 MatrixPanel_I2S_DMA* dma_display = nullptr;
 
 uint16_t myBLACK = dma_display->color565(0, 0, 0);
@@ -17,20 +17,16 @@ uint16_t myRED = dma_display->color565(255, 0, 0);
 uint16_t myGREEN = dma_display->color565(0, 255, 0);
 uint16_t myBLUE = dma_display->color565(0, 0, 255);
 
-
-
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
 // From: https://gist.github.com/davidegironi/3144efdc6d67e5df55438cc3cba613c8
 uint16_t colorWheel(uint8_t pos) {
     if (pos < 85) {
         return dma_display->color565(pos * 3, 255 - pos * 3, 0);
-    }
-    else if (pos < 170) {
+    } else if (pos < 170) {
         pos -= 85;
         return dma_display->color565(255 - pos * 3, 0, pos * 3);
-    }
-    else {
+    } else {
         pos -= 170;
         return dma_display->color565(0, pos * 3, 255 - pos * 3);
     }
@@ -42,7 +38,7 @@ void drawText(int colorWheelOffset) {
     // dma_display->setFont(&FreeSans9pt7b);
     dma_display->setTextSize(1);     // size 1 == 8 pixels high
     dma_display->setTextWrap(false); // Don't wrap at end of line - will do ourselves
-    dma_display->setCursor(5, 16);    // start at top left, with 5 pixel of spacing
+    dma_display->setCursor(5, 16);   // start at top left, with 5 pixel of spacing
 
     uint8_t w = 0;
     const char* str = "ESP32 DMA";
@@ -87,29 +83,47 @@ void drawText(int colorWheelOffset) {
     dma_display->print("B");
     dma_display->setTextColor(dma_display->color444(15, 0, 8));
     dma_display->println("*");
-
 }
-
 
 void setup() {
     dma_display = makePanel(false);
 
     dma_display->begin();
-    dma_display->setBrightness8(90); //0-255
+    dma_display->setBrightness8(90); // 0-255
     dma_display->clearScreen();
     dma_display->fillScreen(myWHITE);
 
     // fix the screen with green
-    dma_display->fillRect(0, 0, dma_display->width(), dma_display->height(), dma_display->color444(0, 15, 0));
+    dma_display->fillRect(
+        0, 0, dma_display->width(), dma_display->height(), dma_display->color444(0, 15, 0)
+    );
     delay(500);
 
     // draw a box in yellow
-    dma_display->drawRect(0, 0, dma_display->width(), dma_display->height(), dma_display->color444(15, 15, 0));
+    dma_display->drawRect(
+        0,
+        0,
+        dma_display->width(),
+        dma_display->height(),
+        dma_display->color444(15, 15, 0)
+    );
     delay(500);
 
     // draw an 'X' in red
-    dma_display->drawLine(0, 0, dma_display->width() - 1, dma_display->height() - 1, dma_display->color444(15, 0, 0));
-    dma_display->drawLine(dma_display->width() - 1, 0, 0, dma_display->height() - 1, dma_display->color444(15, 0, 0));
+    dma_display->drawLine(
+        0,
+        0,
+        dma_display->width() - 1,
+        dma_display->height() - 1,
+        dma_display->color444(15, 0, 0)
+    );
+    dma_display->drawLine(
+        dma_display->width() - 1,
+        0,
+        0,
+        dma_display->height() - 1,
+        dma_display->color444(15, 0, 0)
+    );
     delay(500);
 
     // draw a blue circle
@@ -123,8 +137,7 @@ void setup() {
     // fill the screen with 'black'
     dma_display->fillScreen(dma_display->color444(0, 0, 0));
 
-    //drawText(0);
-
+    // drawText(0);
 }
 
 uint8_t wheelval = 0;

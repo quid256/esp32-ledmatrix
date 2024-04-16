@@ -2,6 +2,9 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .direnv/
+.cache
+
+compile_commands.json
 
 # Secrets (wifi password)
 src/secrets.h

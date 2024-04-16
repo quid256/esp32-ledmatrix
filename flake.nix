@@ -20,6 +20,11 @@
             packages = [
               platformio
               avrdude
+              clang-tools
+
+              nodejs
+              nodePackages.prettier
+              nodePackages.typescript-language-server
             ];
           };
         }

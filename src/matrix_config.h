@@ -21,23 +21,33 @@
 #define PANEL_HEIGHT 64 // Panel height of 64 will required CH_E to be defined.
 #define PANELS_NUMBER 1 // Number of chained panels, if just a single panel, obviously set to 1
 
-#define PANE_WIDTH PANEL_WIDTH * PANELS_NUMBER
+#define PANE_WIDTH PANEL_WIDTH *PANELS_NUMBER
 #define PANE_HEIGHT PANEL_HEIGHT
-#define NUM_LEDS PANE_WIDTH * PANE_HEIGHT
+#define NUM_LEDS PANE_WIDTH *PANE_HEIGHT
 
 // Construct the MatrixPanel Object
-MatrixPanel_I2S_DMA* makePanel(bool double_buffer) {
+MatrixPanel_I2S_DMA *makePanel(bool double_buffer) {
     HUB75_I2S_CFG::i2s_pins _pins = {
-        R1, G1, BL1,
-        R2, G2, BL2,
-        CH_A, CH_B, CH_C, CH_D, CH_E,
-        LAT, OE, CLK,
+        R1,
+        G1,
+        BL1,
+        R2,
+        G2,
+        BL2,
+        CH_A,
+        CH_B,
+        CH_C,
+        CH_D,
+        CH_E,
+        LAT,
+        OE,
+        CLK,
     };
     HUB75_I2S_CFG mxconfig(PANEL_WIDTH, PANEL_HEIGHT, PANELS_NUMBER, _pins);
 
     mxconfig.gpio.e = CH_E;
     mxconfig.driver = HUB75_I2S_CFG::FM6126A; // for panels using FM6126A chips
-    mxconfig.double_buff = double_buffer; // <------------- Turn on double buffer
+    mxconfig.double_buff = double_buffer;     // <------------- Turn on double buffer
     mxconfig.i2sspeed = HUB75_I2S_CFG::HZ_20M;
     mxconfig.min_refresh_rate = 255;
     // mxconfig.clkphase = false;

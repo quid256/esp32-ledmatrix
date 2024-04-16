@@ -22,12 +22,12 @@ uint8_t rectWidth = 8;
 
 void loop() {
     curMillis = millis();
-    dma_display->flipDMABuffer(); // Show the back buffer, set currently output buffer to the back (i.e. no longer being sent to LED panels)
+    dma_display->flipDMABuffer(); // Show the back buffer, set currently output buffer to
+                                  // the back (i.e. no longer being sent to LED panels)
 
     // x += dx;
     // y += dy;
-    if (x == 0)
-    {
+    if (x == 0) {
         dx = +1;
     }
     // if (y == 0) { dy = +1; }
@@ -37,11 +37,14 @@ void loop() {
     // if (y + rectWidth == dma_display->height()) { dy = -1; }
 
     dma_display->clearScreen();
-    // dma_display->fillRect(0, x, dma_display->height(), rectWidth, dma_display->color444(15, 0, 0));
-    // dma_display->fillRect(x, 0, 1, dma_display->width(), dma_display->color444(0, 15, 0));
+    // dma_display->fillRect(0, x, dma_display->height(), rectWidth,
+    // dma_display->color444(15, 0, 0)); dma_display->fillRect(x, 0, 1,
+    // dma_display->width(), dma_display->color444(0, 15, 0));
 
     for (uint8_t i = 0; i < dma_display->height(); ++i) {
-        dma_display->drawFastHLine(x, i, rectWidth, dma_display->color565(255 - i * 4, i * 4, 0));
+        dma_display->drawFastHLine(
+            x, i, rectWidth, dma_display->color565(255 - i * 4, i * 4, 0)
+        );
     }
 
     // dma_display->fillRect(x, x, rectWidth, rectWidth, dma_display->color444(0, 0, 15));

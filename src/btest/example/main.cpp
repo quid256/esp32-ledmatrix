@@ -18,7 +18,6 @@
 #endif
 #include "main.h"
 
-
 #define R1 6
 #define G1 5
 #define BL1 9
@@ -36,27 +35,28 @@
 
 // Configure for your panel(s) as appropriate!
 #define PANEL_WIDTH 64
-#define PANEL_HEIGHT 64         // Panel height of 64 will required CH_E to be defined.
+#define PANEL_HEIGHT 64 // Panel height of 64 will required CH_E to be defined.
 
 #ifdef VIRTUAL_PANE
-#define PANELS_NUMBER 4         // Number of chained panels, if just a single panel, obviously set to 1
+#define PANELS_NUMBER                                                                    \
+    4 // Number of chained panels, if just a single panel, obviously set to 1
 #else
-#define PANELS_NUMBER 2         // Number of chained panels, if just a single panel, obviously set to 1
+#define PANELS_NUMBER                                                                    \
+    2 // Number of chained panels, if just a single panel, obviously set to 1
 #endif
 
-#define PANE_WIDTH PANEL_WIDTH * PANELS_NUMBER
+#define PANE_WIDTH (PANEL_WIDTH * PANELS_NUMBER)
 #define PANE_HEIGHT PANEL_HEIGHT
-#define NUM_LEDS PANE_WIDTH*PANE_HEIGHT
+#define NUM_LEDS (PANE_WIDTH * PANE_HEIGHT)
 
 #ifdef VIRTUAL_PANE
-#define NUM_ROWS 2 // Number of rows of chained INDIVIDUAL PANELS
-#define NUM_COLS 2 // Number of INDIVIDUAL PANELS per ROW
-#define PANEL_CHAIN NUM_ROWS*NUM_COLS    // total number of panels chained one to another
+#define NUM_ROWS 2                        // Number of rows of chained INDIVIDUAL PANELS
+#define NUM_COLS 2                        // Number of INDIVIDUAL PANELS per ROW
+#define PANEL_CHAIN (NUM_ROWS * NUM_COLS) // total number of panels chained one to another
 // Change this to your needs, for details on VirtualPanel pls read the PDF!
 #define SERPENT true
 #define TOPDOWN false
 #endif
-
 
 #ifdef VIRTUAL_PANE
 VirtualMatrixPanel* matrix = nullptr;
@@ -88,11 +88,13 @@ void setup() {
     Serial.println("Starting pattern test...");
 
     // redefine pins if required
-    HUB75_I2S_CFG::i2s_pins _pins = { R1, G1, BL1, R2, G2, BL2, CH_A, CH_B, CH_C, CH_D, CH_E, LAT, OE, CLK };
+    HUB75_I2S_CFG::i2s_pins _pins = {
+        R1, G1, BL1, R2, G2, BL2, CH_A, CH_B, CH_C, CH_D, CH_E, LAT, OE, CLK
+    };
     HUB75_I2S_CFG mxconfig(PANEL_WIDTH, PANEL_HEIGHT, PANELS_NUMBER, _pins);
 
     mxconfig.gpio.e = CH_E;
-    mxconfig.driver = HUB75_I2S_CFG::FM6126A;   // for panels using FM6126A chips
+    mxconfig.driver = HUB75_I2S_CFG::FM6126A; // for panels using FM6126A chips
 
 #ifndef VIRTUAL_PANE
     matrix = new MatrixPanel_I2S_DMA(mxconfig);
@@ -103,10 +105,12 @@ void setup() {
     chain->begin();
     chain->setBrightness8(255);
     // create VirtualDisplay object based on our newly created dma_display object
-    matrix = new VirtualMatrixPanel((*chain), NUM_ROWS, NUM_COLS, PANEL_WIDTH, PANEL_HEIGHT, CHAIN_TOP_LEFT_DOWN);
+    matrix = new VirtualMatrixPanel(
+        (*chain), NUM_ROWS, NUM_COLS, PANEL_WIDTH, PANEL_HEIGHT, CHAIN_TOP_LEFT_DOWN
+    );
 #endif
 
-    ledbuff = (CRGB*)malloc(NUM_LEDS * sizeof(CRGB));  // allocate buffer for some tests
+    ledbuff = (CRGB*)malloc(NUM_LEDS * sizeof(CRGB)); // allocate buffer for some tests
     buffclear(ledbuff);
 }
 
@@ -175,7 +179,7 @@ void loop() {
     Serial.print("Estimating fillscreenRGB888(r, g, b) time: ");
     t1 = micros();
     ccount1 = XTHAL_GET_CCOUNT();
-    matrix->fillScreenRGB888(64, 64, 64);   // white
+    matrix->fillScreenRGB888(64, 64, 64); // white
     ccount2 = XTHAL_GET_CCOUNT() - ccount1;
     t2 = micros() - t1;
     s1 += t2;
@@ -198,8 +202,6 @@ void loop() {
     ccount1 = XTHAL_GET_CCOUNT() - ccount1;
     t2 = micros() - t1;
     Serial.printf("%lu us, %u ticks\n", t2, ccount1);
-
-
 
     // created random color gradient in ledbuff
     uint8_t color1 = 0;
@@ -229,7 +231,7 @@ void loop() {
     //
 
 #ifndef NO_FAST_FUNCTIONS
-  // Fillrate for fillRect() function
+    // Fillrate for fillRect() function
     Serial.print("Estimating fullscreen fillrate with fillRect() time: ");
     t1 = micros();
     matrix->fillRect(0, 0, PANE_WIDTH, PANE_HEIGHT, 0, 224, 0);
@@ -237,8 +239,7 @@ void loop() {
     Serial.printf("%lu us\n", t2);
     delay(PATTERN_DELAY);
 
-
-    Serial.print("Chessboard with fillRect(): ");  // шахматка
+    Serial.print("Chessboard with fillRect(): "); // шахматка
     matrix->fillScreen(0);
     x = 0, y = 0;
     color1 = random8();
@@ -261,7 +262,7 @@ void loop() {
 #endif
 
     // ======== V-Lines ==========
-    Serial.println("Estimating V-lines with drawPixelRGB888(): ");  //
+    Serial.println("Estimating V-lines with drawPixelRGB888(): "); //
     matrix->fillScreen(0);
     color1 = random8();
     color2 = random8();
@@ -281,7 +282,7 @@ void loop() {
     delay(PATTERN_DELAY);
 
 #ifndef NO_FAST_FUNCTIONS
-    Serial.println("Estimating V-lines with vlineDMA(): ");  //
+    Serial.println("Estimating V-lines with vlineDMA(): "); //
     matrix->fillScreen(0);
     color2 = random8();
     x = y = 0;
@@ -296,7 +297,7 @@ void loop() {
     Serial.printf("%lu us, %u ticks\n", t2, ccount1);
     delay(PATTERN_DELAY);
 
-    Serial.println("Estimating V-lines with fillRect(): ");  //
+    Serial.println("Estimating V-lines with fillRect(): "); //
     matrix->fillScreen(0);
     color1 = random8();
     color2 = random8();
@@ -313,10 +314,8 @@ void loop() {
     delay(PATTERN_DELAY);
 #endif
 
-
-
     // ======== H-Lines ==========
-    Serial.println("Estimating H-lines with drawPixelRGB888(): ");  //
+    Serial.println("Estimating H-lines with drawPixelRGB888(): "); //
     matrix->fillScreen(0);
     color2 = random8();
     x = y = 0;
@@ -351,7 +350,7 @@ void loop() {
     Serial.printf("%lu us, %u ticks\n", t2, ccount1);
     delay(PATTERN_DELAY);
 
-    Serial.println("Estimating H-lines with fillRect(): ");  //
+    Serial.println("Estimating H-lines with fillRect(): "); //
     matrix->fillScreen(0);
     color2 = random8();
     color3 = random8();
@@ -368,18 +367,14 @@ void loop() {
     delay(PATTERN_DELAY);
 #endif
 
-
-
-
     Serial.println("\n====\n");
 
     // take a rest for a while
     delay(10000);
 }
 
-
 void buffclear(CRGB* buf) {
-    memset(buf, 0x00, NUM_LEDS * sizeof(CRGB)); // flush buffer to black  
+    memset(buf, 0x00, NUM_LEDS * sizeof(CRGB)); // flush buffer to black
 }
 
 void IRAM_ATTR mxfill(CRGB* leds) {
@@ -405,8 +400,7 @@ void IRAM_ATTR mxfill(CRGB* leds) {
 uint16_t XY16(uint16_t x, uint16_t y) {
     if (x < PANE_WIDTH && y < PANE_HEIGHT) {
         return (y * PANE_WIDTH) + x;
-    }
-    else {
+    } else {
         return 0;
     }
 }
@@ -419,7 +413,7 @@ void drawText(int colorWheelOffset) {
     matrix->setTextSize(1);     // size 1 == 8 pixels high
     matrix->setTextWrap(false); // Don't wrap at end of line - will do ourselves
 
-    matrix->setCursor(5, 5);    // start at top left, with 5,5 pixel of spacing
+    matrix->setCursor(5, 5); // start at top left, with 5,5 pixel of spacing
     uint8_t w = 0;
 
     for (w = 0; w < strlen(str); w++) {
@@ -432,12 +426,10 @@ void drawText(int colorWheelOffset) {
 uint16_t colorWheel(uint8_t pos) {
     if (pos < 85) {
         return matrix->color565(pos * 3, 255 - pos * 3, 0);
-    }
-    else if (pos < 170) {
+    } else if (pos < 170) {
         pos -= 85;
         return matrix->color565(255 - pos * 3, 0, pos * 3);
-    }
-    else {
+    } else {
         pos -= 170;
         return matrix->color565(0, pos * 3, 255 - pos * 3);
     }

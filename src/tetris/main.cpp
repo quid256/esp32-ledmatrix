@@ -3,7 +3,6 @@
 #include <TetrisMatrixDraw.h>
 #include "matrix_config.h"
 
-
 #define ANIMATION_TIME 50000
 
 // portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
@@ -17,10 +16,11 @@ TetrisMatrixDraw tetris(*display);
 // void IRAM_ATTR display_updater() {
 //     // Increment the counter and set the time of ISR
 //     portENTER_CRITICAL_ISR(&timerMux);
-//     display->flipDMABuffer(); // Show the back buffer, set currently output buffer to the back (i.e. no longer being sent to LED panels)
+//     display->flipDMABuffer(); // Show the back buffer, set currently output buffer to
+//     the back (i.e. no longer being sent to LED panels)
 //     portEXIT_CRITICAL_ISR(&timerMux);
 // }
-//   
+//
 // void animationHandler()
 // {
 //     portENTER_CRITICAL_ISR(&timerMux);
@@ -43,7 +43,8 @@ void loop() {
     if (i == 5) {
         display->clearScreen();
         tetris.drawNumbers(-5, 40);
-        // display->fillRect(0, x, dma_display->height(), rectWidth, dma_display->color444(15, 0, 0));
+        // display->fillRect(0, x, dma_display->height(), rectWidth,
+        // dma_display->color444(15, 0, 0));
         i = 0;
     }
     i++;

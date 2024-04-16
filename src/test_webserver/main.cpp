@@ -8,7 +8,7 @@
 #include <ESPmDNS.h>
 #include "secrets.h"
 
-const char *hostname = "gumby";
+const char* hostname = "gumby";
 
 // Instantiate an async webserver object
 AsyncWebServer server(80);
@@ -35,53 +35,55 @@ String localIP;
 boolean state = false;
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial)
-    ;
+    Serial.begin(115200);
+    while (!Serial)
+        ;
 
-  // Connect to WiFi
-  WiFi.begin(WIFI_SSID, WIFI_PWD);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("connecting to wifi...");
-  }
+    // Connect to WiFi
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
+    delay(100);
 
-  // Set up mDNS (allows for nice *.local address on LAN)
-  if (!MDNS.begin(hostname)) {
-    Serial.println("!! ERROR setting mDNS responder");
-  } else {
-    Serial.printf("mDNS responder set: %s\n", hostname);
-  }
-
-  localIP = WiFi.localIP().toString();
-  Serial.printf("IP Address: %s\n", localIP);
-
-  // Set up web server endpoints
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    int n_params = request->params();
-    for (int i = 0; i < n_params; i++) {
-      AsyncWebParameter* p = request->getParam(i);
-
-      if (p->name() == "state") {
-        state = (p->value() == "T");
-        Serial.printf("Set state: %s\n", state ? "TRUE" : "FALSE");
-      }
+    WiFi.begin(WIFI_SSID, WIFI_PWD);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("connecting to wifi...");
     }
-    // Respond with the contents of the index_html string
-    request->send_P(200, "text/html", index_html, [](const String &var) {
-      // Called for each of the %TEMPLATE% strings in the above --
-      // can be used to specialize what the webpage shows to different
-      // situations
-      if (var == "MESSAGE") {
-        return localIP;
-      } else if (var == "STATE") {
-        return String(state ? "TRUE" : "FALSE");
-      }
+    Serial.println(WiFi.localIP());
 
-      return String();
+    // Set up mDNS (allows for nice *.local address on LAN)
+    if (!MDNS.begin(hostname)) {
+        Serial.println("!! ERROR setting mDNS responder");
+    } else {
+        Serial.printf("mDNS responder set: %s\n", hostname);
+    }
+
+    // Set up web server endpoints
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+        int n_params = request->params();
+        for (int i = 0; i < n_params; i++) {
+            AsyncWebParameter* p = request->getParam(i);
+
+            if (p->name() == "state") {
+                state = (p->value() == "T");
+                Serial.printf("Set state: %s\n", state ? "TRUE" : "FALSE");
+            }
+        }
+        // Respond with the contents of the index_html string
+        request->send_P(200, "text/html", index_html, [](const String& var) {
+            // Called for each of the %TEMPLATE% strings in the above --
+            // can be used to specialize what the webpage shows to different
+            // situations
+            if (var == "MESSAGE") {
+                return localIP;
+            } else if (var == "STATE") {
+                return String(state ? "TRUE" : "FALSE");
+            }
+
+            return String();
+        });
     });
-  });
-  server.begin();
+    server.begin();
 }
 
 void loop() {}

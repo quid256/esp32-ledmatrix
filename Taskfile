@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# vim: set syntax=bash
+
+# this is a Taskfile -- it's just a bash script that serves the purpose of a
+# Makefile. Add a bash function to set up a new build target or task
+
+function compile_commands {
+    pio run -t compiledb
+    sed -i -E "s/-mlongcalls//g" compile_commands.json
+    sed -i -E "s/-fno-tree-switch-conversion//g" compile_commands.json
+    sed -i -E "s/-fstrict-volatile-bitfields//g" compile_commands.json
+}
+
+function help {
+    echo "USAGE: $0 <task> <args>"
+    echo "TASKS:"
+    compgen -A function | cat -n
+    TIMEFORMAT=""
+}
+
+TIMEFORMAT="Task completed in %3lR"
+time ${@:-help}

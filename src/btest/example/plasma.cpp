@@ -2,7 +2,8 @@
  * Portions of this code are adapted from Aurora: https://github.com/pixelmatix/aurora
  * Copyright (c) 2014 Jason Coon
  *
- * Portions of this code are adapted from LedEffects Plasma by Robert Atkins: https://bitbucket.org/ratkins/ledeffects/src/26ed3c51912af6fac5f1304629c7b4ab7ac8ca4b/Plasma.cpp?at=default
+ * Portions of this code are adapted from LedEffects Plasma by Robert Atkins:
+ * https://bitbucket.org/ratkins/ledeffects/src/26ed3c51912af6fac5f1304629c7b4ab7ac8ca4b/Plasma.cpp?at=default
  * Copyright (c) 2013 Robert Atkins
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,25 +24,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include <FastLED.h>
 #include "matrix_config.h"
 
-
- // placeholder for the matrix object
+// placeholder for the matrix object
 MatrixPanel_I2S_DMA* dma_display = nullptr;
-
 
 uint16_t time_counter = 0, cycles = 0, fps = 0;
 unsigned long fps_timer;
 
 CRGB currentColor;
-CRGBPalette16 palettes[] = { HeatColors_p, LavaColors_p, RainbowColors_p, RainbowStripeColors_p, CloudColors_p };
+CRGBPalette16 palettes[] = {
+    HeatColors_p, LavaColors_p, RainbowColors_p, RainbowStripeColors_p, CloudColors_p
+};
 CRGBPalette16 currentPalette = palettes[0];
 
-
-CRGB ColorFromCurrentPalette(uint8_t index = 0, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) {
+CRGB ColorFromCurrentPalette(
+    uint8_t index = 0, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND
+) {
     return ColorFromPalette(currentPalette, index, brightness, blendType);
 }
 
@@ -51,7 +52,7 @@ void setup() {
     dma_display = makePanel(true);
 
     // let's adjust default brightness to about 75%
-    dma_display->setBrightness8(255);    // range is 0-255, 0 - 0%, 255 - 100%
+    dma_display->setBrightness8(255); // range is 0-255, 0 - 0%, 255 - 100%
 
     // Allocate memory and start DMA display
     if (not dma_display->begin())
@@ -74,8 +75,12 @@ void loop() {
             v += cos16(y * (128 - wibble) + time_counter);
             v += sin16(y * x * cos8(-time_counter) / 8);
 
-            currentColor = ColorFromPalette(currentPalette, (v >> 8) + 127); //, brightness, currentBlendType);
-            dma_display->drawPixelRGB888(x, y, currentColor.r, currentColor.g, currentColor.b);
+            currentColor = ColorFromPalette(
+                currentPalette, (v >> 8) + 127
+            ); //, brightness, currentBlendType);
+            dma_display->drawPixelRGB888(
+                x, y, currentColor.r, currentColor.g, currentColor.b
+            );
         }
     }
 
@@ -90,7 +95,8 @@ void loop() {
     }
 
     // print FPS rate every 5 seconds
-    // Note: this is NOT a matrix refresh rate, it's the number of data frames being drawn to the DMA buffer per second
+    // Note: this is NOT a matrix refresh rate, it's the number of data frames being drawn
+    // to the DMA buffer per second
     if (fps_timer + 5000 < millis()) {
         Serial.printf_P(PSTR("Effect fps: %d\n"), fps / 5);
         fps_timer = millis();
