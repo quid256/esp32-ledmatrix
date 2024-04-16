@@ -9,6 +9,9 @@ indent_style = space
 indent_size = 4
 charset = utf-8
 
+[flake.nix]
+indent_style = space
+indent_size = 2
 
 [*.{c++,cc,cpp,cxx,h,h++,hh,hpp,hxx,inl,ipp,tlh,tli}]
 cpp_new_line_before_open_brace_function = same_line

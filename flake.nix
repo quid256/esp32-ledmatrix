@@ -1,22 +1,28 @@
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  description = "PlatformIO Development Environment";
+
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
-    in
-      with pkgs; {
-        devShells.default = mkShell {
-          packages = [
-            platformio
-            avrdude
-          ];
-        };
-      });
+  }: let
+    forAllSystems = function:
+      nixpkgs.lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-linux"
+      ] (system: function (import nixpkgs {inherit system;}));
+  in {
+    devShells = forAllSystems (
+      pkgs:
+        with pkgs; {
+          default = mkShell {
+            packages = [
+              platformio
+              avrdude
+            ];
+          };
+        }
+    );
+  };
 }
