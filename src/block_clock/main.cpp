@@ -27,9 +27,15 @@ extern const uint8_t data_end[] asm("_binary_mockups_out_bin_end");
 #define MILITARY_TIME false
 
 // Colors that're used in the clock (r, g, b)
-#define CLR_ACTIVE 0, 200, 200
-#define CLR_SEMIACTIVE 0, 110, 110
-#define CLR_INACTIVE 50, 50, 50
+// #define CLR_ACTIVE 107, 209, 129
+// #define CLR_ACTIVE 73, 163, 82
+// #define CLR_ACTIVE 82, 156, 90
+// #define CLR_SEMIACTIVE 83, 138, 106
+// #define CLR_SEMIACTIVE 72, 97, 74
+//
+#define CLR_ACTIVE 133, 255, 145     // HSV: 126deg, 48%, 100%
+#define CLR_SEMIACTIVE 116, 153, 120 // HSV: 126deg, 24%, 60%
+#define CLR_INACTIVE 50, 50, 50      // HSV: *, 0%, 20%
 
 // Size of the blocks (in LEDs)
 const uint8_t block_size = 3;
