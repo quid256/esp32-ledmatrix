@@ -1,13 +1,12 @@
-
 /*
  * Binary format
  * 9*([# variants = N] N*6*[variant encoding])
  * M*([fsindex] [tsindex] [# steps = S] S*[step])
  *
  *
- * where 
+ * where
  * - variant encoding is just the bitmask of the shape concatted (with 4 trailing 0s)
- * - fsindex, tsindex are 4 bits to specify number + 4 bits to specify variant 
+ * - fsindex, tsindex are 4 bits to specify number + 4 bits to specify variant
  * - each step is 0, 4 bits for row selection, 2 bits for column selection, 1 bit for orientation
  */
 const fs = require("fs");
@@ -16,79 +15,112 @@ const VERBOSE = false;
 
 let states = [
   [
-    [0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000, 0b1000, 0b0000],
-    [0b0000, 0b0010, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000],
-    [0b0000, 0b0100, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000],
-    [0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000, 0b0000, 0b0010],
-  ],
-  [
-    [0b0100,
-      0b0110,
-      0b0000,
-      0b1100,
-      0b0100,
-      0b0100,
-      0b0100,
-      0b1110,
-      0b0000,
-      0b0100,
-      0b0010],
-    [0b0100, 0b0010, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000, 0b0110, 0b0010],
-    [0b1100, 0b1100, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000, 0b0001, 0b0000],
-    [0b0000, 0b1100, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000, 0b0111, 0b0000],
-  ],
-  [
-    [0b0000, 0b1000, 0b0000, 0b1110, 0b0010, 0b1110, 0b1000, 0b1110, 0b0000, 0b0000, 0b0010],
-    [0b0100, 0b0000, 0b0000, 0b1110, 0b0010, 0b1110, 0b1000, 0b1110, 0b0000, 0b0010, 0b0000],
-  ],
-  [
-    [0b1000, 0b0000, 0b0000, 0b1110, 0b0010, 0b1110, 0b0010, 0b1110, 0b0000, 0b0000, 0b0100],
-    [0b0000, 0b0000, 0b0000, 0b1110, 0b0010, 0b1110, 0b0010, 0b1110, 0b0000, 0b1010, 0b0000],
-  ],
-  [
-    [0b0000, 0b1100, 0b0000, 0b1010, 0b1010, 0b1110, 0b0010, 0b0010, 0b0000, 0b0110, 0b0000],
-    [0b0010, 0b1100, 0b0000, 0b1010, 0b1010, 0b1110, 0b0010, 0b0010, 0b1000, 0b0000, 0b0000],
-  ],
-  [
-    [0b0000, 0b1010, 0b0000, 0b1110, 0b1000, 0b1110, 0b0010, 0b1110, 0b0000, 0b0000, 0b0000],
-    [0b0000, 0b0001, 0b0000, 0b1110, 0b1000, 0b1110, 0b0010, 0b1110, 0b0000, 0b0100, 0b0000],
-  ],
-  [
     [
-      0b0000,
-      0b0000,
-      0b0000,
-      0b1110,
-      0b1000,
-      0b1110,
-      0b1010,
-      0b1110,
-      0b0000,
-      0b1000,
-      0b0000],
-    [0b0001, 0b0000, 0b0000, 0b1110, 0b1000, 0b1110, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000],
-  ],
-  [
+      0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000,
+      0b1000, 0b0000,
+    ],
     [
-      0b0010,
-      0b0110,
-      0b0000,
-      0b1110,
-      0b0010,
-      0b0100,
-      0b1000,
-      0b1000,
-      0b0000,
-      0b1110,
-      0b0000
+      0b0000, 0b0010, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000,
+      0b0000, 0b0000,
+    ],
+    [
+      0b0000, 0b0100, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000,
+      0b0000, 0b0000,
+    ],
+    [
+      0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1010, 0b1010, 0b1110, 0b0000,
+      0b0000, 0b0010,
     ],
   ],
   [
-    [0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1110, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000],
+    [
+      0b0100, 0b0110, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000,
+      0b0100, 0b0010,
+    ],
+    [
+      0b0100, 0b0010, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000,
+      0b0110, 0b0010,
+    ],
+    [
+      0b1100, 0b1100, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000,
+      0b0001, 0b0000,
+    ],
+    [
+      0b0000, 0b1100, 0b0000, 0b1100, 0b0100, 0b0100, 0b0100, 0b1110, 0b0000,
+      0b0111, 0b0000,
+    ],
   ],
   [
-    [0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1110, 0b0010, 0b1110, 0b0000, 0b0010, 0b0000],
-    [0b0000, 0b0100, 0b0000, 0b1110, 0b1010, 0b1110, 0b0010, 0b1110, 0b0000, 0b0000, 0b0000],
+    [
+      0b0000, 0b1000, 0b0000, 0b1110, 0b0010, 0b1110, 0b1000, 0b1110, 0b0000,
+      0b0000, 0b0010,
+    ],
+    [
+      0b0100, 0b0000, 0b0000, 0b1110, 0b0010, 0b1110, 0b1000, 0b1110, 0b0000,
+      0b0010, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b1000, 0b0000, 0b0000, 0b1110, 0b0010, 0b1110, 0b0010, 0b1110, 0b0000,
+      0b0000, 0b0100,
+    ],
+    [
+      0b0000, 0b0000, 0b0000, 0b1110, 0b0010, 0b1110, 0b0010, 0b1110, 0b0000,
+      0b1010, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b0000, 0b1100, 0b0000, 0b1010, 0b1010, 0b1110, 0b0010, 0b0010, 0b0000,
+      0b0110, 0b0000,
+    ],
+    [
+      0b0010, 0b1100, 0b0000, 0b1010, 0b1010, 0b1110, 0b0010, 0b0010, 0b1000,
+      0b0000, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b0000, 0b1010, 0b0000, 0b1110, 0b1000, 0b1110, 0b0010, 0b1110, 0b0000,
+      0b0000, 0b0000,
+    ],
+    [
+      0b0000, 0b0001, 0b0000, 0b1110, 0b1000, 0b1110, 0b0010, 0b1110, 0b0000,
+      0b0100, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b0000, 0b0000, 0b0000, 0b1110, 0b1000, 0b1110, 0b1010, 0b1110, 0b0000,
+      0b1000, 0b0000,
+    ],
+    [
+      0b0001, 0b0000, 0b0000, 0b1110, 0b1000, 0b1110, 0b1010, 0b1110, 0b0000,
+      0b0000, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b0010, 0b0110, 0b0000, 0b1110, 0b0010, 0b0100, 0b1000, 0b1000, 0b0000,
+      0b1110, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1110, 0b1010, 0b1110, 0b0000,
+      0b0000, 0b0000,
+    ],
+  ],
+  [
+    [
+      0b0000, 0b0000, 0b0000, 0b1110, 0b1010, 0b1110, 0b0010, 0b1110, 0b0000,
+      0b0010, 0b0000,
+    ],
+    [
+      0b0000, 0b0100, 0b0000, 0b1110, 0b1010, 0b1110, 0b0010, 0b1110, 0b0000,
+      0b0000, 0b0000,
+    ],
   ],
 ];
 //
@@ -119,7 +151,6 @@ function bytesToBase64(int_list) {
   return btoa(binString);
 }
 
-
 if (true) {
   encoded = [];
   for (let s of states) {
@@ -134,7 +165,7 @@ if (true) {
       encoded.push(c[10] << 4);
     }
   }
-  fs.writeFileSync('out.bin', new Uint8Array(encoded), { flag: 'w' }, () => { });
+  fs.writeFileSync("out.bin", new Uint8Array(encoded), { flag: "w" }, () => {});
 }
 
 class PriorityQueue {
@@ -214,13 +245,12 @@ class PriorityQueue {
   heapifyUpFrom(index) {
     while (
       this.hasParent(index) &&
-      this.costmap.get(this.parent(index)) >
-      this.costmap.get(this.heap[index])
+      this.costmap.get(this.parent(index)) > this.costmap.get(this.heap[index])
     ) {
       this.swap(this.getParentIndex(index), index);
       index = this.getParentIndex(index);
     }
-    return index
+    return index;
   }
 
   heapifyUp() {
@@ -238,7 +268,7 @@ class PriorityQueue {
       if (
         this.hasRightChild(index) &&
         this.costmap.get(this.rightChild(index)) <
-        this.costmap.get(this.leftChild(index))
+          this.costmap.get(this.leftChild(index))
       ) {
         smallerChildIndex = this.getRightChildIndex(index);
       }
@@ -272,7 +302,7 @@ function state_dist(sa, sb) {
   for (let i = 0; i < sa.length; i++) {
     tot += !!(sa[i] ^ sb[i]);
   }
-  return tot
+  return tot;
 }
 
 cases = [];
@@ -288,9 +318,9 @@ for (let _i = 0; _i < states.length; _i++) {
   }
 }
 
-const PB_LEN = 100
+const PB_LEN = 100;
 
-process.stdout.write("[" + " ".repeat(PB_LEN) + "]\r")
+process.stdout.write("[" + " ".repeat(PB_LEN) + "]\r");
 
 for (let _ic = 0; _ic < cases.length; _ic++) {
   let [fsIndex, tsIndex] = cases[_ic];
@@ -306,7 +336,9 @@ for (let _ic = 0; _ic < cases.length; _ic++) {
   }
 
   function heuristic(fromstate) {
-    let g = Array.from({ length: toState.length }, () => Array.from({ length: 4 }, () => 0));
+    let g = Array.from({ length: toState.length }, () =>
+      Array.from({ length: 4 }, () => 0),
+    );
 
     for (let i = 0; i < fromstate.length; i++) {
       if (fromstate[i] & 0b1000) {
@@ -393,7 +425,7 @@ for (let _ic = 0; _ic < cases.length; _ic++) {
           if (l & m) {
             let mid = ((i - 1) << 3) + (s << 1) + 1;
             res = callback(
-              state.map((x, j) => (j == i || j == i - 1) ? x ^ m : x),
+              state.map((x, j) => (j == i || j == i - 1 ? x ^ m : x)),
               mid,
             );
             if (res) return;
@@ -409,8 +441,18 @@ for (let _ic = 0; _ic < cases.length; _ic++) {
     let curState = m.get(curHash);
     let dist = ms.get(curHash);
 
-    let k = Math.round((_ic + 1) / cases.length * PB_LEN)
-    process.stdout.write(fsIndex + "," + tsIndex + "; " + dist + " [" + ".".repeat(k) + " ".repeat(PB_LEN - k) + "]\r")
+    let k = Math.round(((_ic + 1) / cases.length) * PB_LEN);
+    process.stdout.write(
+      fsIndex +
+        "," +
+        tsIndex +
+        "; " +
+        dist +
+        " [" +
+        ".".repeat(k) +
+        " ".repeat(PB_LEN - k) +
+        "]\r",
+    );
 
     // displayState(curState)
     neighbors(curState, (n, mid) => {
@@ -435,28 +477,41 @@ for (let _ic = 0; _ic < cases.length; _ic++) {
           let curL = nh;
           let pmid;
           let steps = [];
-          let grids = [m.get(curL)]
+          let grids = [m.get(curL)];
           while (mp.has(curL)) {
             [curL, pmid] = mp.get(curL);
             steps.unshift(pmid);
-            grids.unshift(m.get(curL))
+            grids.unshift(m.get(curL));
           }
           if (VERBOSE) {
-            console.log("gl", grids.length, "sl", steps.length)
+            console.log("gl", grids.length, "sl", steps.length);
             for (let i = 0; i < steps.length; i++) {
-              console.log(grids[i].map(row => row.toString(2).padStart(4, "0")).join("\n"))
-              console.log(steps[i] >> 3, (steps[i] >> 1) & 3, steps[i] & 1)
-              console.log(state_dist(grids[i], grids[i + 1]))
+              console.log(
+                grids[i]
+                  .map((row) => row.toString(2).padStart(4, "0"))
+                  .join("\n"),
+              );
+              console.log(steps[i] >> 3, (steps[i] >> 1) & 3, steps[i] & 1);
+              console.log(state_dist(grids[i], grids[i + 1]));
             }
-            console.log(grids[grids.length - 1].map(row => row.toString(2).padStart(4, "0")).join("\n"))
-            console.log("DONE")
+            console.log(
+              grids[grids.length - 1]
+                .map((row) => row.toString(2).padStart(4, "0"))
+                .join("\n"),
+            );
+            console.log("DONE");
           }
           steps.unshift(steps.length);
           steps.unshift(tsIndex);
           steps.unshift(fsIndex);
 
           // var b64encoded = bytesToBase64(steps);
-          fs.writeFileSync('out.bin', new Uint8Array(steps), { flag: 'a' }, () => { });
+          fs.writeFileSync(
+            "out.bin",
+            new Uint8Array(steps),
+            { flag: "a" },
+            () => {},
+          );
           // let c = localStorage.getItem("parts");
           // if (!c) {
           //     c = [];
@@ -474,6 +529,14 @@ for (let _ic = 0; _ic < cases.length; _ic++) {
     });
   }
 
-  let k = Math.round((_ic + 1) / cases.length * PB_LEN)
-  process.stdout.write(fsIndex + "," + tsIndex + " [" + ".".repeat(k) + " ".repeat(PB_LEN - k) + "]\r")
+  let k = Math.round(((_ic + 1) / cases.length) * PB_LEN);
+  process.stdout.write(
+    fsIndex +
+      "," +
+      tsIndex +
+      " [" +
+      ".".repeat(k) +
+      " ".repeat(PB_LEN - k) +
+      "]\r",
+  );
 }

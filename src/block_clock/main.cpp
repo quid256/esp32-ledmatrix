@@ -33,9 +33,9 @@ extern const uint8_t data_end[] asm("_binary_mockups_out_bin_end");
 // #define CLR_SEMIACTIVE 83, 138, 106
 // #define CLR_SEMIACTIVE 72, 97, 74
 //
-#define CLR_ACTIVE 133, 255, 145     // HSV: 126deg, 48%, 100%
-#define CLR_SEMIACTIVE 116, 153, 120 // HSV: 126deg, 24%, 60%
-#define CLR_INACTIVE 50, 50, 50      // HSV: *, 0%, 20%
+// #define CLR_ACTIVE 133, 255, 145     // HSV: 126deg, 48%, 100%
+// #define CLR_SEMIACTIVE 116, 153, 120 // HSV: 126deg, 24%, 60%
+// #define CLR_INACTIVE 50, 50, 50      // HSV: *, 0%, 20%
 
 // Size of the blocks (in LEDs)
 const uint8_t block_size = 3;
@@ -43,15 +43,21 @@ const uint8_t block_size = 3;
 // The display object
 MatrixPanel_I2S_DMA* display = makePanel(true);
 
+const uint16_t color_active = display->color565(133, 255, 145);
+const uint16_t color_semiactive = display->color565(116, 153, 120);
+const uint16_t color_inactive = display->color565(50, 50, 50);
+const uint16_t black = display->color565(0, 0, 0);
+
 /// Interpolate between two colors
-uint16_t interpolate_color(
-    double amnt, uint8_t r1, uint8_t g1, uint8_t b1, uint8_t r2, uint8_t g2, uint8_t b2
-) {
+uint16_t interpolate_color(double amnt, uint16_t start, uint16_t end) {
+    uint8_t rs, gs, bs, re, ge, be;
+    display->color565to888(start, rs, gs, bs);
+    display->color565to888(end, re, ge, be);
 
     return display->color565(
-        static_cast<uint8_t>((1 - amnt) * r1 + amnt * r2),
-        static_cast<uint8_t>((1 - amnt) * g1 + amnt * g2),
-        static_cast<uint8_t>((1 - amnt) * b1 + amnt * b2)
+        static_cast<uint8_t>((1 - amnt) * rs + amnt * re),
+        static_cast<uint8_t>((1 - amnt) * gs + amnt * ge),
+        static_cast<uint8_t>((1 - amnt) * bs + amnt * be)
     );
 }
 
@@ -60,11 +66,11 @@ uint16_t get_color(double col, double row) {
     double l = max(constrain(abs(row - 5.) - 2., 0., 2.), constrain(col - 2, 0., 1.));
 
     if (l < 1) {
-        return interpolate_color(l, CLR_ACTIVE, CLR_SEMIACTIVE);
+        return interpolate_color(l, color_active, color_semiactive);
     } else if (l < 2) {
-        return interpolate_color(l - 1, CLR_SEMIACTIVE, CLR_INACTIVE);
+        return interpolate_color(l - 1, color_semiactive, color_inactive);
     } else {
-        return display->color565(CLR_INACTIVE);
+        return color_inactive;
     }
 }
 
@@ -239,26 +245,88 @@ struct BlockDigit {
                         // If the current cell is active and the current step involve the
                         // block in the current cell moving, then display the block
                         // partially moved
-                        uint8_t interp_x = static_cast<uint8_t>(
-                            block_size * ((1 - this->progress) * x +
-                                          this->progress * (col + other_col - x)) +
-                            0.5
-                        );
-                        uint8_t interp_y = static_cast<uint8_t>(
-                            block_size * ((1 - this->progress) * y +
-                                          this->progress * (row + other_row - y)) +
-                            0.5
-                        );
-                        display->fillRect(
-                            this->x + interp_x,
-                            this->y + interp_y,
-                            block_size,
-                            block_size,
-                            get_color(
-                                static_cast<double>(interp_x) / block_size,
-                                static_cast<double>(interp_y) / block_size
-                            )
-                        );
+                        // uint8_t interp_x = static_cast<uint8_t>(
+                        //     block_size * ((1 - this->progress) * x +
+                        //                   this->progress * (col + other_col - x)) +
+                        //     0.5
+                        // );
+                        // uint8_t interp_y = static_cast<uint8_t>(
+                        //     block_size * ((1 - this->progress) * y +
+                        //                   this->progress * (row + other_row - y)) +
+                        //     0.5
+                        // );
+                        // display->fillRect(
+                        //     this->x + interp_x,
+                        //     this->y + interp_y,
+                        //     block_size,
+                        //     block_size,
+                        //     get_color(
+                        //         static_cast<double>(interp_x) / block_size,
+                        //         static_cast<double>(interp_y) / block_size
+                        //     )
+                        // );
+                        // double partialY = (1 - this->progress) * x + this->progress *
+                        // (col + ooher_col - y) double partialY = (1 - this->progress) *
+                        // y + this->progress * (row + other_row - y)
+                        //
+                        //
+                        if (col != other_col) {
+                            double interp_x =
+                                ((1 - this->progress) * x +
+                                 this->progress * (col + other_col - x));
+                            uint16_t color = get_color(interp_x, y);
+
+                            for (uint8_t i = 0; i < block_size * 2; i++) {
+                                double ss = constrain(
+                                    col + static_cast<double>(i) / block_size - interp_x,
+                                    0.0,
+                                    1.0
+                                );
+                                double se = constrain(
+                                    col + static_cast<double>(i + 1) / block_size -
+                                        interp_x,
+                                    0.0,
+                                    1.0
+                                );
+
+                                display->drawFastVLine(
+                                    this->x + block_size * col + i,
+                                    this->y + block_size * y,
+                                    block_size,
+                                    interpolate_color(
+                                        (se - ss) * block_size, black, color
+                                    )
+                                );
+                            }
+                        } else {
+                            double interp_y =
+                                ((1 - this->progress) * y +
+                                 this->progress * (row + other_row - y));
+                            uint16_t color = get_color(x, interp_y);
+
+                            for (uint8_t i = 0; i < block_size * 2; i++) {
+                                double ss = constrain(
+                                    row + static_cast<double>(i) / block_size - interp_y,
+                                    0.0,
+                                    1.0
+                                );
+
+                                double se = constrain(
+                                    row + static_cast<double>(i + 1) / block_size -
+                                        interp_y,
+                                    0.0,
+                                    1.0
+                                );
+                                display->drawFastHLine(
+                                    this->x + block_size * x,
+                                    this->y + block_size * row + i,
+                                    block_size,
+                                    interpolate_color(
+                                        (se - ss) * block_size, black, color
+                                    )
+                                );
+                            }
+                        }
                         continue;
                     }
                     display->fillRect(
@@ -287,8 +355,8 @@ void print_clock() {
     for (size_t i = 0; i < 4; i++) {
         digits[i].print(display);
     }
-    display->fillRect(31, 27, 3, 3, display->color565(CLR_SEMIACTIVE));
-    display->fillRect(31, 33, 3, 3, display->color565(CLR_SEMIACTIVE));
+    display->fillRect(31, 27, 3, 3, color_semiactive);
+    display->fillRect(31, 33, 3, 3, color_semiactive);
     display->flipDMABuffer();
 }
 
@@ -302,13 +370,13 @@ void evolve_digits_to(uint8_t targets[4], uint32_t d) {
     }
 
     while (!all_finished) {
-        for (size_t k = 0; k < 3; k++) {
+        for (size_t k = 0; k < 20; k++) {
             delay(d);
             // update the progress along the current step for each currently unfinished
             // digit
             for (size_t i = 0; i < 4; i++) {
                 if (!finished[i]) {
-                    digits[i].set_progress((static_cast<double>(k) + 1) / 3.);
+                    digits[i].set_progress((static_cast<double>(k) + 1) / 20.);
                 }
             }
             print_clock();
@@ -422,7 +490,7 @@ void setup() {
         digits[i].step_data_start = step_data;
         digits[i].init();
     }
-    printTime(10);
+    printTime(2);
 }
 
-void loop() { delay(60500 - 1000 * printTime(75)); }
+void loop() { delay(60500 - 1000 * printTime(10)); }
