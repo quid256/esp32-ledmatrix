@@ -25,6 +25,7 @@
               nodejs
               nodePackages.prettier
               nodePackages.typescript-language-server
+              nodePackages.live-server
             ];
           };
         }
