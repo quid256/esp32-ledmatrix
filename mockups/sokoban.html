@@ -1,0 +1,469 @@
+<!doctype html>
+
+<html>
+    <head>
+        <script type="text/javascript">
+            states = [
+                [
+                    [
+                        0b0000, 0b0000, 0b0000, 0b1110, 0b1010,
+                        0b1010, 0b1010, 0b1110, 0b0000, 0b1000, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b0010, 0b0000, 0b1110, 0b1010,
+                        0b1010, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b0100, 0b0000, 0b1110, 0b1010,
+                        0b1010, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b0000, 0b0000, 0b1110, 0b1010,
+                        0b1010, 0b1010, 0b1110, 0b0000, 0b0000, 0b0010,
+                    ],
+                ],
+                [
+                    [
+                        0b0100, 0b0110, 0b0000, 0b1100, 0b0100,
+                        0b0100, 0b0100, 0b1110, 0b0000, 0b0100, 0b0010,
+                    ],
+                    [
+                        0b0100, 0b0010, 0b0000, 0b1100, 0b0100,
+                        0b0100, 0b0100, 0b1110, 0b0000, 0b0110, 0b0010,
+                    ],
+                    [
+                        0b1100, 0b1100, 0b0000, 0b1100, 0b0100,
+                        0b0100, 0b0100, 0b1110, 0b0000, 0b0001, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b1100, 0b0000, 0b1100, 0b0100,
+                        0b0100, 0b0100, 0b1110, 0b0000, 0b0111, 0b0000,
+                    ],
+                ],
+                [
+                    [
+                        0b0000, 0b1000, 0b0000, 0b1110, 0b0010,
+                        0b1110, 0b1000, 0b1110, 0b0000, 0b0000, 0b0010,
+                    ],
+                    [
+                        0b0100, 0b0000, 0b0000, 0b1110, 0b0010,
+                        0b1110, 0b1000, 0b1110, 0b0000, 0b0010, 0b0000,
+                    ]
+                ],
+                [
+                    [
+                        0b1000, 0b0000, 0b0000, 0b1110, 0b0010,
+                        0b1110, 0b0010, 0b1110, 0b0000, 0b0000, 0b0100,
+                    ],
+                    [
+                        0b0000, 0b0000, 0b0000, 0b1110, 0b0010,
+                        0b1110, 0b0010, 0b1110, 0b0000, 0b1010, 0b0000,
+                    ],
+                ],
+
+                [
+                    [
+                        0b0000, 0b1100, 0b0000, 0b1010, 0b1010,
+                        0b1110, 0b0010, 0b0010, 0b0000, 0b0110, 0b0000,
+                    ],
+                    [
+                        0b0010, 0b1100, 0b0000, 0b1010, 0b1010,
+                        0b1110, 0b0010, 0b0010, 0b1000, 0b0000, 0b0000,
+                    ],
+                ],
+                [
+                    [
+                        0b0000, 0b1010, 0b0000, 0b1110, 0b1000,
+                        0b1110, 0b0010, 0b1110, 0b0000, 0b0000, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b0001, 0b0000, 0b1110, 0b1000,
+                        0b1110, 0b0010, 0b1110, 0b0000, 0b0100, 0b0000,
+                    ],
+                ],
+                [
+                    [
+                        0b0000, 0b0000, 0b0000, 0b1110, 0b1000,
+                        0b1110, 0b1010, 0b1110, 0b0000, 0b1000, 0b0000,
+                    ],
+                    [
+                        0b0001, 0b0000, 0b0000, 0b1110, 0b1000,
+                        0b1110, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000,
+                    ],
+                ],
+                [
+                    [
+                        0b0010, 0b0110, 0b0000, 0b1110, 0b0010,
+                        0b0100, 0b1000, 0b1000, 0b0000, 0b1110, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b1100, 0b0000, 0b1110, 0b0010,
+                        0b0100, 0b1000, 0b1000, 0b0000, 0b0011, 0b0011,
+                    ],
+                ],
+                [
+                    [
+                        0b0000, 0b0000, 0b0000, 0b1110, 0b1010,
+                        0b1110, 0b1010, 0b1110, 0b0000, 0b0000, 0b0000,
+                    ],
+                ],
+                [
+                    [
+                        0b0000, 0b0000, 0b0000, 0b1110, 0b1010,
+                        0b1110, 0b0010, 0b1110, 0b0000, 0b0010, 0b0000,
+                    ],
+                    [
+                        0b0000, 0b0100, 0b0000, 0b1110, 0b1010,
+                        0b1110, 0b0010, 0b1110, 0b0000, 0b0000, 0b0000,
+                    ],
+                ]
+            ]
+
+            function bytesToBase64(int_list) {
+                bytes = new Uint8Array(int_list)
+              const binString = Array.from(bytes, (byte) =>
+                String.fromCodePoint(byte),
+              ).join("");
+              return btoa(binString);
+            }
+
+            if (true) {
+                encoded = []
+                for (let s of states) {
+                    encoded.push(s.length)
+                    for (let i = 0; i < s.length; i++) {
+                        c = s[i]
+                        encoded.push((c[0] << 4) | c[1])
+                        encoded.push((c[2] << 4) | c[3])
+                        encoded.push((c[4] << 4) | c[5])
+                        encoded.push((c[6] << 4) | c[7])
+                        encoded.push((c[8] << 4) | c[9])
+                        encoded.push(c[10] << 4)
+                    }
+                }
+
+                var b64encoded = bytesToBase64(encoded);
+                localStorage.setItem("sym_spec", b64encoded)
+            }
+
+
+            class PriorityQueue {
+            constructor(costmap) {
+                this.heap = [];
+                this.costmap = costmap;
+                this.indexMap = new Map();
+            }
+             
+            // Helper Methods
+            getLeftChildIndex(parentIndex) { return 2 * parentIndex + 1; }
+            getRightChildIndex(parentIndex) { return 2 * parentIndex + 2; }
+            getParentIndex(childIndex) { return Math.floor((childIndex - 1) / 2); }
+          
+            hasLeftChild(index) { return this.getLeftChildIndex(index) < this.heap.length; }
+            hasRightChild(index) { return this.getRightChildIndex(index) < this.heap.length; }
+            hasParent(index) { return this.getParentIndex(index) >= 0; }
+            leftChild(index) { return this.heap[this.getLeftChildIndex(index)]; }
+            rightChild(index) { return this.heap[this.getRightChildIndex(index)]; }
+            parent(index) { return this.heap[this.getParentIndex(index)]; }
+          
+            swap(indexOne, indexTwo) {
+                const temp = this.heap[indexOne];
+                this.heap[indexOne] = this.heap[indexTwo];
+                this.heap[indexTwo] = temp;
+
+                this.indexMap.set(this.heap[indexOne], indexOne);
+                this.indexMap.set(this.heap[indexTwo], indexTwo);
+            }
+             
+            peek() {
+                if (this.heap.length === 0) {
+                    return null;
+                }
+                return this.heap[0];
+            }
+         
+            // Removing an element will remove the
+            // top element with highest priority then
+            // heapifyDown will be called 
+            remove() {
+                if (this.heap.length === 0) {
+                    return null;
+                }
+                const item = this.heap[0];
+                this.heap[0] = this.heap[this.heap.length - 1];
+                this.indexMap.set(this.heap[0], 0)
+                this.heap.pop();
+                this.heapifyDown();
+                return item;
+            }
+         
+                add(item) {
+                    this.heap.push(item);
+                    this.indexMap.set(item, this.heap.length - 1)
+                    this.heapifyUp();
+                }
+
+                heapifyUpFrom(index) {
+                    while (this.hasParent(index) && this.costmap.get(this.parent(index))
+                        > this.costmap.get(this.heap[index])) {
+                        this.swap(this.getParentIndex(index), index);
+                        index = this.getParentIndex(index);
+                    }
+                }
+             
+                heapifyUp() {
+                    this.heapifyUpFrom(this.heap.length - 1)
+                }
+
+                updateUp(val) {
+                    this.heapifyUpFrom(this.indexMap.get(val))
+                }
+
+                removeValue(v) {
+                    for (let i = 0; i < this.heap.length; i++) {
+                        if (this.heap[i] == v) {
+                            this.heapifyDownFrom(i)
+                            this.heapify
+                        }
+                    }
+                }
+
+                heapifyDown() {
+                     let index = 0;
+                     while (this.hasLeftChild(index)) {
+                         let smallerChildIndex = this.getLeftChildIndex(index);
+                         if (this.hasRightChild(index) && this.costmap.get(this.rightChild(index))
+                             < this.costmap.get(this.leftChild(index))) {
+                             smallerChildIndex = this.getRightChildIndex(index);
+                         }
+                         if (this.costmap.get(this.heap[index]) < this.costmap.get(this.heap[smallerChildIndex])) {
+                             break;
+                         } else {
+                             this.swap(index, smallerChildIndex);
+                         }
+                         index = smallerChildIndex;
+                     }
+                 }
+            }
+
+            window.addEventListener("load", () => {
+                let cnv = document.getElementById("canvas");
+                let ctx = cnv.getContext("2d");
+
+                function displayState(s) {
+                    ctx.clearRect(0, 0, 300, 900);
+                    for (let i = 0; i < s.length; i++) {
+                        let inset = 0
+                        ctx.fillStyle = (s[i] & 0b1000) ? "black" : "gray";
+                        inset = (s[i] & 0b1000) ? 0 : 5;
+                        ctx.fillRect(0 + inset, i * 50 + inset, 50 - 2 * inset, 50 - 2 * inset);
+
+                        ctx.fillStyle = (s[i] & 0b0100) ? "black" : "gray";
+                        inset = (s[i] & 0b0100) ? 0 : 5;
+                        ctx.fillRect(50 + inset, i * 50 + inset, 50 - 2 * inset, 50 - 2 * inset);
+
+                        ctx.fillStyle = (s[i] & 0b0010) ? "black" : "gray";
+                        inset = (s[i] & 0b0010) ? 0 : 5;
+                        ctx.fillRect(100 + inset, i * 50 + inset, 50 - 2 * inset, 50 - 2 * inset);
+
+                        ctx.fillStyle = (s[i] & 0b0001) ? "black" : "gray";
+                        inset = (s[i] & 0b0001) ? 0 : 5;
+                        ctx.fillRect(150 + inset, i * 50 + inset, 50 - 2 * inset, 50 - 2 * inset);
+                    }
+                }
+                function hashState(s) {
+                    let h = 0
+                    for (let i = 0; i < s.length; i++){
+                        h += (s[i] << (i * 4));
+                    }
+                    return h
+                }
+
+
+                cases = []
+                // for (let _i = 0; _i < states.length; _i++) {
+                //     for (let _si = 0; _si < states[_i].length; _si++) {
+                //         for (let _sn = 0; _sn < states[(_i + 1) % states.length].length; _sn++) {
+                //             cases.push([(_i << 4) | _si, (((_i + 1) % states.length) << 4) | _sn]);
+                //             cases.push([(_i << 4) | _si, (((_i + 1) % states.length) << 4) | _sn]);
+                //             cases.push([(_i << 4) | _si, (((_i + 1) % states.length) << 4) | _sn]);
+                //             cases.push([(_i << 4) | _si, (((_i + 1) % states.length) << 4) | _sn]);
+                //             cases.push([(_i << 4) | _si, (((_i + 1) % states.length) << 4) | _sn]);
+                //         }
+                //     }
+                // }
+                //
+
+                for (let c of cases) {
+                    let [fsIndex, tsIndex] = c;
+                    let fromState = states[(fsIndex >> 4) & 0x0F][fsIndex & 0x0F];
+                    let toState = states[(tsIndex >> 4) & 0x0F][tsIndex & 0x0F];
+
+                function add_tostate(g, i, j, mul) {
+                    for (let k = 0; k < toState.length; k++) {
+                        for (let l = 0; l < 4; l++) {
+                            g[k][l] += mul * (Math.abs(k - i) + Math.abs(j - l)) * 1;
+                        }
+                    }
+                }
+
+                function heuristic(fromstate) {
+                    let g = Array.from({length: toState.length}, (_, i) => (
+                        Array.from({length: 4}, (_, j) => 0)
+                    ));
+                    for (let i = 0; i < fromstate.length; i++) {
+                        if (fromstate[i] & 0b1000) { add_tostate(g, i, 0, +1); }
+                        if (fromstate[i] & 0b0100) { add_tostate(g, i, 1, +1); }
+                        if (fromstate[i] & 0b0010) { add_tostate(g, i, 2, +1); }
+                        if (fromstate[i] & 0b0001) { add_tostate(g, i, 3, +1); }
+                    }
+                    for (let i = 0; i < toState.length; i++) {
+                        if (toState[i] & 0b1000) { add_tostate(g, i, 0, -1); }
+                        if (toState[i] & 0b0100) { add_tostate(g, i, 1, -1); }
+                        if (toState[i] & 0b0010) { add_tostate(g, i, 2, -1); }
+                        if (toState[i] & 0b0001) { add_tostate(g, i, 3, -1); }
+                    }
+
+                    let v = g.reduce((a, b) => a + b.reduce((x, y) => x + Math.abs(y), 0), 0);
+                    return v+ 5 * Math.random()
+                }
+
+
+                    // displayState(fromState);
+
+                    let path = []
+                    let m = new Map();
+                    let mh = new Map();
+                    let ms = new Map();
+                    let mp = new Map();
+
+                    let h = hashState(fromState)
+                    let surface = new PriorityQueue(mh)
+                    m.set(h, fromState)
+                    ms.set(h, 0)
+                    mh.set(h, heuristic(fromState))
+                    surface.add(h)
+
+                    // let h = heuristic(fromState, tostate_processed)
+                    // mh.set(surface[0], h)
+                    // console.log(heuristic(fromState, tostate_processed))
+
+                    function neighbors(state, callback) {
+                        for (let i = 0; i < state.length; i++) {
+                            let l = (state[i] >> 1) ^ state[i]
+                            let res;
+                            if (l & 0b100) {
+                                let mid = (i << 3) + (0 << 1)
+                                res = callback(state.map((x, j) => j == i ? (state[i] ^ 0b1100) : x), mid)
+                                if (res) return
+                            }
+                            if (l & 0b010) {
+                                let mid = (i << 3) + (1 << 1)
+                                res = callback(state.map((x, j) => j == i ? (state[i] ^ 0b0110) : x), mid)
+                                if (res) return
+                            }
+                            if (l & 0b001) {
+                                let mid = (i << 3) + (2 << 1)
+                                res = callback(state.map((x, j) => j == i ? (state[i] ^ 0b0011) : x), mid)
+                                if (res) return
+                            }
+
+                            if (i > 0) {
+                                let l = state[i] ^ state[i - 1]
+                                for (let s = 0; s < 4; s++) {
+                                    let m = [0b1000, 0b0100, 0b0010, 0b0001][s]
+                                    if (l & m) {
+                                        let mid = ((i - 1) << 3) + (s << 1) + 1
+                                        res = callback(state.map((x, j) => (j == i || j == i - 1) ? (state[j] ^ m) : x), mid)
+                                        if (res) return
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    let didit = false;
+
+                    // let intvl = setInterval(() => {
+                    //     let counter = 0
+                    while (surface.heap.length > 0 && !didit) {
+                        let curHash = surface.remove();
+                        let curState = m.get(curHash);
+                        let dist = ms.get(curHash);
+
+                        // displayState(curState)
+                        neighbors(curState, (n, mid) => {
+                            let nh = hashState(n);
+                            if (m.has(nh)) {
+                                let old_dist =ms.get(nh)
+                                if (dist + 1 < old_dist) {
+                                    ms.set(nh, dist + 1);
+                                    mh.set(nh, mh.get(nh) + dist + 1 - old_dist);
+                                    mp.set(nh, [curHash, mid]);
+                                    surface.updateUp(nh)
+                                }
+                            } else {
+                                let h = heuristic(n)
+                                m.set(nh, n);
+                                ms.set(nh, dist + 1);
+                                mh.set(nh, dist + 1 + h);
+                                mp.set(nh, [curHash, mid]);
+
+                                if (nh == hashState(toState)) {
+                                    // console.log("didit");
+                                    didit = true;
+                                    // displayState(n);
+                                    // clearInterval(intvl);
+                                    // console.log(m.size)
+                                    // console.log(surface.heap.length)
+                                    let curL = nh
+                                    let pmid;
+                                    steps = []
+                                    while (mp.has(curL)) {
+                                        [curL, pmid] = mp.get(curL)
+                                        steps.unshift(pmid)
+                                    }
+                                    steps.unshift(steps.length)
+                                    steps.unshift(tsIndex)
+                                    steps.unshift(fsIndex)
+
+                                    let c = localStorage.getItem("parts");
+                                    if (!c) {
+                                        c = []
+                                    } else {
+                                        c = JSON.parse(c)
+                                    }
+                                    var b64encoded = bytesToBase64(steps);
+                                    c.push(b64encoded)
+                                    localStorage.setItem("parts", JSON.stringify(c))
+                                    console.log("didit")
+
+                                    return true
+                                    // curL = nh
+                                    // setInterval(() => {
+                                    //     let pmid;
+                                    //     if (mp.has(curL)) {
+                                    //         [curL, pmid] = mp.get(curL)
+                                    //         // console.log(pmid)
+                                    //     } else {
+                                    //         curL = nh
+                                    //     }
+                                    //     displayState(m.get(curL));
+                                    // }, 200)
+                                    // return
+                                }
+                                surface.add(nh)
+                            }
+                        })
+                        // counter += 1;
+                    }
+                    // }, 10)
+                }
+
+
+            })
+        </script>
+    </head>
+    <body>
+        <canvas id="canvas" width=200 height=550></canvas>
+    </body>
+</html>
